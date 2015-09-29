@@ -1,4 +1,4 @@
-# write-html.py
+# create index.html for static code analysis output
 import datetime
 import glob
 import os,sys
