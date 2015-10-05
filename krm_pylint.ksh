@@ -1,7 +1,7 @@
 #!/bin/bash
 #script to create output of pylint on all python programs at arg1 in html format.
 dir=$1
-#job_name=${JOB_NAME}
+job_name=${JOB_NAME}
 job_name="krm"
 BUILD_NUMBER=1 		#comment this line before running from jenkins
 bld_nbr=${BUILD_NUMBER}
@@ -24,17 +24,22 @@ do
         newfile=`echo $file | tr / _ | sed s/\.py/.html/`
         echo "new file:$newfile"
 	#pylint run
-        sudo pylint --disable=all $file --output-format=html >> $newdir/pylint/$newfile
+        #sudo pylint --disable=all $file --output-format=html >> $newdir/pylint/$newfile
+	outfile=$newdir/pylint/$newfile
+	sh ./pylint.ksh $file $outfile
 	echo "pylint completed!"
 
 	#radon run
 	echo "<pre>" > $newdir/radon/$newfile
-	sudo radon cc $file >> $newdir/radon/$newfile
+	echo "Cyclomatic Complexity <br />" >> $newdir/radon/$newfile
+	sudo radon cc $file -a -nc >> $newdir/radon/$newfile
+	echo "Raw Metric <br />" >> $newdir/radon/$newfile
+	sudo radon raw $file >> $newdir/radon/$newfile
 	echo "radon completed!"
 
 	#flake8 run
 	echo "<pre>" > $newdir/flake8/$newfile
-	sudo radon cc $file >> $newdir/flake8/$newfile
+	sudo flake8 $file >> $newdir/flake8/$newfile
 	echo "flake8 completed!"
 
         count=`expr $count + 1`;

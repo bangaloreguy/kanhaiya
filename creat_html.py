@@ -7,8 +7,8 @@ import os,sys
 html_dir="/kanalysis"
 now = datetime.datetime.today()
 curdate="%4d-%02d-%02d" % ( now.year,now.month,now.day)
-#bld_nbr=os.environ.get('BUILD_NUMBER')
-#job=os.environ.get('JOB_NAME')
+bld_nbr=os.environ.get('BUILD_NUMBER')
+job=os.environ.get('JOB_NAME')
 bld_nbr="1"
 job="krm"
 #curdate="09-28-2015"
@@ -72,8 +72,3 @@ gf.close()
 
 
 sys.exit()
-
-
-#for file in glob.glob("*.html"):
-#	temp="""<li><a href="%s/%s">%s/%s</a></li>""" % (dir,file,cwd,file)
-#	list=list+temp
