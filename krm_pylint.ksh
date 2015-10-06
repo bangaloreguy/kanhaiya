@@ -21,13 +21,13 @@ sudo chmod 777 $newdir $newdir/pylint $newdir/radon $newdir/flake8
 #exit 0;
 #file="incall.py"
 count=0
-for file in `find $dir -not -path '*/\.*' -name "in*.py"`;
+#for file in `find $dir -not -path '*/\.*' -name "*.py"`;
+for file in `find $dir -not -path '*/\.*' -a -path $dir/kpack -prune -o -name "*.py"`;
 do
         echo "File# $count: $file";
         newfile=`echo $file | tr / _ | sed s/\.py/.html/`
         echo "new file:$newfile"
 	#pylint run
-        #sudo pylint --disable=all $file --output-format=html >> $newdir/pylint/$newfile
 	outfile=$newdir/pylint/$newfile
 	sh ./pylint.ksh $file $outfile
 	echo "pylint completed!"
@@ -42,8 +42,8 @@ do
 
 	#flake8 run
 	echo "<pre>" > $newdir/flake8/$newfile
-	echo "<p><b><big>flake8 output for $newfile </p></b></big>" >> $newdir/flake8/$newfile
-	sudo flake8 $file >> $newdir/flake8/$newfile
+	echo "<p><b><big>flake8 analysis: </p></b></big>" >> $newdir/flake8/$newfile
+	sudo flake8 --config=/var/lib/jenkins/.config/flake8 $file >> $newdir/flake8/$newfile
 	echo "flake8 completed!"
 
         count=`expr $count + 1`;
@@ -51,7 +51,7 @@ done
 
 #coverage report
 cd $workspace
-/usr/local/jenkins/projects/krm_env/bin/coverage run manage.py test ivr --noinput
+/usr/local/jenkins/projects/krm_env/bin/coverage run manage.py test auth circle clients common knowlus number --noinput
 
 if [ -f $workspace/.coverage ]
 then

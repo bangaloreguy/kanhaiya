@@ -7,10 +7,10 @@ import os,sys
 html_dir="/kanalysis"
 now = datetime.datetime.today()
 curdate="%4d-%02d-%02d" % ( now.year,now.month,now.day)
-#bld_nbr=os.environ.get('BUILD_NUMBER')
-#job=os.environ.get('JOB_NAME')
-bld_nbr="1"
-job="krm"
+bld_nbr=os.environ.get('BUILD_NUMBER')
+job=os.environ.get('JOB_NAME')
+#bld_nbr="1"
+#job="krm"
 #curdate="09-28-2015"
 oldcwd=os.getcwd()
 print "oldcwd=%s" %(oldcwd)
@@ -23,38 +23,42 @@ cwd=os.getcwd()
 print "Showing files in %s" %(cwd)
 globallist=""
 for dir in os.listdir(cwd): 
-    os.chdir(dir)
-    localdir=os.getcwd()
-    print "localdir is %s" % (localdir)
-    list=""
-    for file in os.listdir(localdir):
-	if str(file).endswith('.html'):
-		print "subdir is %s and file is %s" % (dir,file)
-        	#print os.path.join(subdir, file)
-		#temp="""<li><a href="%s/%s">%s/%s/%s/%s</a></li><br />\n""" % (localdir,file,html_dir,newdir,dir,file)
-		temp="""<li><a href="%s/%s/%s/%s">%s</a></li><br />\n""" % (html_dir,newdir,dir,file,file)
-		list=list+temp
-    #print "list =%s" % (list)
-
-    message = """<html>
+    if os.path.isfile(dir):
+	continue
+    if dir <> 'htmlcov':
+        os.chdir(dir)
+        localdir=os.getcwd()
+        print "localdir is %s" % (localdir)
+        list=""
+        for file in os.listdir(localdir):
+    	    if str(file).endswith('.html'):
+    		print "subdir is %s and file is %s" % (dir,file)
+            	#print os.path.join(subdir, file)
+    		#temp="""<li><a href="%s/%s">%s/%s/%s/%s</a></li><br />\n""" % (localdir,file,html_dir,newdir,dir,file)
+    		temp="""<li><a href="%s/%s/%s/%s">%s</a></li>\n""" % (html_dir,newdir,dir,file,file)
+    		list=list+temp
+        	#print "list =%s" % (list)
+    
+        message = """<html>
 <head></head>
 <body><p>List of files generated from %s!</p></body>
 %s
 </html>
 """
-    
-    #indexfile="index.%s.html" %(dir)
-    indexfile="index.html" 
-    #print "index file is %s " % (indexfile)
-    f = open(indexfile,'w')
-    msg=message % (dir,list)
-    f.write(msg)
-    os.chdir(cwd)
-    f.close()
+        indexfile="index.html" 
+        f = open(indexfile,'w')
+        msg=message % (dir,list)
+        f.write(msg)
+        os.chdir(cwd)
+        f.close()
 
     #append index file from this dir to global index file
     temp="""<li><a href="%s/%s/%s/%s">%s/%s</a></li><br />\n""" % (html_dir,newdir,dir,indexfile,dir,indexfile)
     globallist=globallist+temp
+
+#add coverage index file to global list: manual since coverage index file is already created by the tool
+#temp="""<li><a href="%s/%s/%s/%s">%s/%s</a></li><br />\n""" % (html_dir,newdir,dir,indexfile,dir,indexfile)
+#globallist=globallist+temp
 
 #create global index file in job directory for this build
 indexfile="index.html"
@@ -72,8 +76,3 @@ gf.close()
 
 
 sys.exit()
-
-
-#for file in glob.glob("*.html"):
-#	temp="""<li><a href="%s/%s">%s/%s</a></li>""" % (dir,file,cwd,file)
-#	list=list+temp
