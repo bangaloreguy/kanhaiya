@@ -1,0 +1,24 @@
+echo "This is build# ${BUILD_NUMBER}"
+echo "Jobname is: ${JOB_NAME}"
+#bash /usr/local/jenkins/files/check_config.sh --project krm
+cd /usr/local/jenkins/workspace/KRM
+echo "user is `whoami`"
+git checkout master
+git fetch
+
+#exit
+#cd /usr/local/jenkins/logs/krm
+#list all regular python files and create pylint output in current directory
+#for file in `find /srv/krm/ -not -path '*/\.*' -name "*.py"`    
+#do
+#        echo "File# $count: $file";
+#        newfile=`echo $file | tr / _ | sed s/\.py/.html/`
+#        echo "new file:$newfile"a
+#        sudo pylint --disable=all $file --output-format=html > $newfile
+#        count=`expr $count + 1`;
+#done
+source_dir=`pwd`
+cd /usr/local/jenkins/logs/krm
+sh krm_pylint.ksh $source_dir
+python creat_html.py
+python /usr/local/jenkins/files/upload-test-result-to-s3_kan.py --project-name krm --to-email "saurabh.prasad@knowlarity.com" --cc-email "kanhaiya.baranwal@knowlarity.com"
